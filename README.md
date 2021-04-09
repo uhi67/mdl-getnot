@@ -35,4 +35,5 @@ Call `http://mdl-getnot.test/get_messages.php` with the following GET parameters
 Returns JSON with fields:
 - status: 'success' or 'error'
 - error: exists only if status is 'error', the error message
-- notifications: integer, the result of the query 
+- notifications: integer, the number of the unread notifications 
+- messages: integer, the number of the unread messages 

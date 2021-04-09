@@ -39,10 +39,28 @@ try {
 
 	if($notifications===false) throw new Exception("Query unsuccesful");
 
+	$sql = /** @lang */"SELECT COUNT(DISTINCT(m.conversationid))
+                  FROM {$prefix}messages m
+            INNER JOIN {$prefix}message_conversations mc
+                    ON m.conversationid = mc.id
+            INNER JOIN {$prefix}message_conversation_members mcm
+                    ON mc.id = mcm.conversationid
+             LEFT JOIN {$prefix}message_user_actions mua
+                    ON (mua.messageid = m.id AND mua.userid = ? AND mua.action = ?)
+                 WHERE mcm.userid = ?
+                   AND mc.enabled = ?
+                   AND mcm.userid != m.useridfrom
+                   AND mua.id is NULL";
+
+	$s = $db->prepare($sql);
+	$messages = $s->execute([$userid, 1, $userid, 1]) ? $s->fetchColumn() : false;
+
 // select max(lastlogin, currentlogin) from {$prefix}user where username=:uid
 // select count(id) from {$prefix}messages where timecreated > :lastlogin
 
-	echo json_encode(['status'=>'succes', 'notifications' => $notifications]);
+// select count(id) from {$prefix}message_contact_requests where requesteduserid=:userid -- ez benne van a notificationsban
+
+	echo json_encode(['status'=>'succes', 'notifications' => $notifications, 'messages'=>$messages]);
 }
 catch(Throwable $e) {
 	echo json_encode(['status' => 'error', 'error'=>$e->getMessage()]);
