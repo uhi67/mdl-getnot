@@ -1,0 +1,30 @@
+{
+    "name": "uhi67/mdl-getnot",
+    "description": "get user notifications from moodle",
+    "type": "project",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=7.2",
+        "ext-dom": "*",
+        "ext-intl": "*",
+        "ext-iconv": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-pdo": "*",
+        "ext-simplexml": "*",
+        "uhi67/envhelper": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "."
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ]
+}
