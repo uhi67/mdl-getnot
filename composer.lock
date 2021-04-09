@@ -4,25 +4,26 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "65765e3d4a3ff635a6e505f2fa345fed",
+    "content-hash": "7c4ba5a8b32db633775454ac76654b09",
     "packages": [
         {
             "name": "uhi67/envhelper",
-            "version": "2.1.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://bitbucket.org/uhi67/envhelper.git",
-                "reference": "9e80d2434979ed3ac0d510081926736f38ac6ea9"
+                "reference": "863c080c83993ed4a2256e8a0004ee0164edc7a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://bitbucket.org/uhi67/envhelper/get/9e80d2434979ed3ac0d510081926736f38ac6ea9.zip",
-                "reference": "9e80d2434979ed3ac0d510081926736f38ac6ea9",
+                "url": "https://bitbucket.org/uhi67/envhelper/get/863c080c83993ed4a2256e8a0004ee0164edc7a1.zip",
+                "reference": "863c080c83993ed4a2256e8a0004ee0164edc7a1",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -42,15 +43,17 @@
             "description": "Helper for environment variables",
             "homepage": "https://bitbucket.org/uhi67/envhelper",
             "support": {
-                "source": "https://bitbucket.org/uhi67/envhelper/src/9e80d2434979ed3ac0d510081926736f38ac6ea9/?at=2.1.1"
+                "source": "https://bitbucket.org/uhi67/envhelper/src/863c080c83993ed4a2256e8a0004ee0164edc7a1/?at=master"
             },
-            "time": "2021-03-11T08:41:06+00:00"
+            "time": "2021-04-09T09:46:25+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "uhi67/envhelper": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

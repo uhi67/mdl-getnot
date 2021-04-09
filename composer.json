@@ -14,7 +14,7 @@
         "ext-openssl": "*",
         "ext-pdo": "*",
         "ext-simplexml": "*",
-        "uhi67/envhelper": "^2.1"
+        "uhi67/envhelper": "dev-master"
     },
     "autoload": {
         "psr-4": {
