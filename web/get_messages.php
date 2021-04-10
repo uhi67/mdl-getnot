@@ -1,10 +1,14 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
-
+<?php
 use uhi67\envhelper\EnvHelper;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-#ini_set('display_errors', 1);
+/** @noinspection PhpUnhandledExceptionInspection */
+$debug = EnvHelper::getEnv('debug', 0);
+if($debug) ini_set('display_errors', 1);
+$computed = null;
+$now = null;
+
 try {
 	$db_config = EnvHelper::getEnv('db', [
 			'dsn' => 'mysql:host=localhost;dbname=credit',
@@ -21,10 +25,10 @@ try {
 	$token = isset($_REQUEST['token']) ? $_REQUEST['token'] : '';
 
 	$now = time();
-	if($ts<$now-$delta || $ts > $now+$delta) throw new Exception("Query is outdated ($now)");
+	if($ts<$now-$delta || $ts > $now+$delta) throw new Exception("Query is outdated");
 
 	$computed = hash('sha512', "$uid,$ts,$secret");
-	if($token != $computed) throw new Exception("Unauthorized ($computed)");
+	if($token != $computed) throw new Exception("Unauthorized");
 
 	$db = new PDO($db_config['dsn'], $db_config['username'], $db_config['password']);
 	$prefix = $db_config['prefix'];
@@ -34,11 +38,17 @@ try {
 
 	if(!$userid) throw new Exception("User not found");
 
-	$s = $db->prepare(/** @lang */ "select count(id) from {$prefix}notifications where useridto=:userid and timeread is null");
-	$notifications = $s->execute([':userid' => $userid]) ? $s->fetchColumn() : false;
+	// Unread notifications
+	$sql = /** @lang */"SELECT count(id)
+               FROM {$prefix}notifications
+              WHERE id IN (SELECT notificationid FROM {$prefix}message_popup_notifications)
+                AND useridto = ?
+                AND timeread is NULL";
 
-	if($notifications===false) throw new Exception("Query unsuccesful");
+	$s = $db->prepare($sql);
+	$notifications = $s->execute([$userid]) ? $s->fetchColumn() : false;
 
+	// Unread messages
 	$sql = /** @lang */"SELECT COUNT(DISTINCT(m.conversationid))
                   FROM {$prefix}messages m
             INNER JOIN {$prefix}message_conversations mc
@@ -55,13 +65,28 @@ try {
 	$s = $db->prepare($sql);
 	$messages = $s->execute([$userid, 1, $userid, 1]) ? $s->fetchColumn() : false;
 
-// select max(lastlogin, currentlogin) from {$prefix}user where username=:uid
-// select count(id) from {$prefix}messages where timecreated > :lastlogin
+	// Contact requests
+	$sql = /** @lang */"SELECT COUNT(mcr.id)
+                  FROM {$prefix}message_contact_requests mcr
+             LEFT JOIN {$prefix}message_users_blocked mub
+                    ON mub.userid = mcr.requesteduserid AND mub.blockeduserid = mcr.userid
+                 WHERE mcr.requesteduserid = :requesteduserid
+                   AND mub.id IS NULL";
+	$s = $db->prepare($sql);
+	$requests = $s->execute(['requesteduserid' => $userid]) ? $s->fetchColumn() : false;
 
-// select count(id) from {$prefix}message_contact_requests where requesteduserid=:userid -- ez benne van a notificationsban
-
-	echo json_encode(['status'=>'succes', 'notifications' => $notifications, 'messages'=>$messages]);
+	echo json_encode([
+		'status'=>'success',
+		'notifications' => $notifications,
+		'messages' => $messages,
+		'requests' => $requests
+	]);
 }
 catch(Throwable $e) {
-	echo json_encode(['status' => 'error', 'error'=>$e->getMessage()]);
+	$response = ['status' => 'error', 'error'=>$e->getMessage()];
+	if($debug) {
+		$response['now'] = $now;
+		if($computed) $response['token'] = $computed;
+	}
+	echo json_encode($response);
 }
